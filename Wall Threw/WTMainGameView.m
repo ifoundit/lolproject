@@ -7,12 +7,18 @@
 //
 
 #import "WTMainGameView.h"
+#import "GADBannerView.h"
+#import "GADRequest.h"
+
 
 @interface WTMainGameView ()
 
 @end
 
 @implementation WTMainGameView
+
+//ads display flag: TRUE ads should be display, FALSE ads is already display;
+BOOL startAds = TRUE;
 
 - (id)init
 {
@@ -146,14 +152,47 @@
     [self.scoreboard addSubview:self.scoreLabel];
     
     
+    
+    
     NSLog(@"viewDidLoad");
 }
+
+//initialise ads view
+
+-(void) adsInit{
+    
+    // Initialize the banner at the top of the screen.
+    CGPoint origin = CGPointMake(0.0,0.0);
+    
+    // Use predefined GADAdSize constants to define the GADBannerView.
+    self.adBanner = [[GADBannerView alloc] initWithAdSize:kGADAdSizeBanner origin:origin];
+    
+    
+    self.adBanner.adUnitID = @"ca-app-pub-8924442229168880/9605517056";
+    self.adBanner.delegate = self;
+    //self.adBanner.backgroundColor = [UIColor greenColor];
+    self.adBanner.rootViewController = self;
+    [self.view addSubview:self.adBanner];
+    [self.adBanner loadRequest:[self request]];
+}
+
 
 //handler for the frame based animations
 - (void) doFrame
 {
+    //
+    
     if(showScore)
     {
+        if (startAds == TRUE)
+        {
+            NSLog(@"Show score.. should show ads here");
+            startAds = FALSE;
+            //show ads
+            [self adsInit];
+            
+            
+        }
         CGRect scoreFrame=self.scoreboard.frame;
         scoreFrame.origin.y-=30;
         self.scoreLabel.text=[NSString stringWithFormat:@"Score: %i",thisscore];
@@ -356,6 +395,10 @@
 }
 - (void) restartGame
 {
+    //clear ads
+    [self.adBanner removeFromSuperview];
+    startAds=TRUE;
+    
     //reset all variables and start again
     framecounter=0;
     frametrigger=200;
@@ -453,5 +496,27 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+#pragma mark GADRequest generation
+
+- (GADRequest *)request {
+    GADRequest *request = [GADRequest request];
+    
+    // you want to receive test ads.
+    //request.testDevices = [NSArray arrayWithObjects:GAD_SIMULATOR_ID, nil];
+    return request;
+}
+
+#pragma mark GADBannerViewDelegate implementation
+
+// We've received an ad successfully.
+- (void)adViewDidReceiveAd:(GADBannerView *)adView {
+    NSLog(@"Received ad successfully");
+}
+
+- (void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error {
+    NSLog(@"Failed to receive ad with error: %@", [error localizedFailureReason]);
+}
+
 
 @end

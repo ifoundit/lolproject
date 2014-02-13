@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
+#import "GADBannerView.h"
+
+@class GADBannerView;
+@class GADRequest;
 
 
-@interface WTMainGameView : UIViewController
+
+@interface WTMainGameView : UIViewController <GADBannerViewDelegate>
 {
     UITapGestureRecognizer *mainTapRecognizer;
     int framecounter;
@@ -38,6 +43,12 @@
     float groundx,groundy,ground2x,ground2y;
     
 }
+
+//ads propeties
+@property(nonatomic, strong) GADBannerView *adBanner;
+//overide request ads
+- (GADRequest *)request;
+
 
 @property (strong, nonatomic) IBOutlet UIImageView *pipe1_top;
 @property (strong, nonatomic) IBOutlet UIImageView *pipe1_bottom;
