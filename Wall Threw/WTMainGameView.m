@@ -35,6 +35,9 @@ BOOL startAds = TRUE;
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
+    //preload the fish images
+    fishImages = [[NSArray alloc] initWithObjects:[UIImage imageNamed:@"fish_l2-60.png"],[UIImage imageNamed:@"fish_l1-60.png"],[UIImage imageNamed:@"fish_n-60.png"],[UIImage imageNamed:@"fish_r1-60.png"],[UIImage imageNamed:@"fish_r2-60.png"],[UIImage imageNamed:@"fish_l2-30.png"],[UIImage imageNamed:@"fish_l1-30.png"],[UIImage imageNamed:@"fish_n-30.png"],[UIImage imageNamed:@"fish_r1-30.png"],[UIImage imageNamed:@"fish_r2-30.png"],[UIImage imageNamed:@"fish_l2-0.png"],[UIImage imageNamed:@"fish_l1-0.png"],[UIImage imageNamed:@"fish_n-0.png"],[UIImage imageNamed:@"fish_r1-0.png"],[UIImage imageNamed:@"fish_r2-0.png"],[UIImage imageNamed:@"fish_l2+30.png"],[UIImage imageNamed:@"fish_l1+30.png"],[UIImage imageNamed:@"fish_n+30.png"],[UIImage imageNamed:@"fish_r1+30.png"],[UIImage imageNamed:@"fish_r2+30.png"],[UIImage imageNamed:@"fish_l2+60.png"],[UIImage imageNamed:@"fish_l1+60.png"],[UIImage imageNamed:@"fish_n+60.png"],[UIImage imageNamed:@"fish_r1+60.png"],[UIImage imageNamed:@"fish_r2+60.png"],[UIImage imageNamed:@"fish_l2+90.png"],[UIImage imageNamed:@"fish_l1+90.png"],[UIImage imageNamed:@"fish_n+90.png"],[UIImage imageNamed:@"fish_r1+90.png"],[UIImage imageNamed:@"fish_r2+90.png"], nil];
+    
     self.view.backgroundColor=[UIColor cyanColor];
     
     //create a timer event to trigger per frame events, for the animations
@@ -49,9 +52,12 @@ BOOL startAds = TRUE;
     frametrigger=200;
     bannerStartPoint=100;
     gravity=0.35;
-    birdVerticalSpeed=0;
+    fishVerticalSpeed=0;
     tapspeed=-7;
-    birdBottom=406;
+    fishBottom=406;
+    fishFrame=0;
+    fishFrameDelay=4;
+    fishFrameForwards=YES;
     
     started=NO;
     showScore=NO;
@@ -62,10 +68,10 @@ BOOL startAds = TRUE;
     groundx=0;
     scoreBoardYTarg=100;
     ground2x=320;
-    groundy=428;
-    ground2y=428;
+    groundy=398;
+    ground2y=398;
     thisscore=0;
-    horizontalSpeed=3;
+    horizontalSpeed=2;
     difficulty=0;
     gapsize=120;
     
@@ -87,12 +93,12 @@ BOOL startAds = TRUE;
     pipe3yt=tmpy-(gapsize/2)-400;
     pipe3yb=tmpy+(gapsize/2);
     
-    CGRect p1TFrame=CGRectMake(pipe1x, pipe1yt, 54, 400);
-    CGRect p1BFrame=CGRectMake(pipe1x, pipe1yb, 54, 400);
-    CGRect p2TFrame=CGRectMake(pipe2x, pipe2yt, 54, 400);
-    CGRect p2BFrame=CGRectMake(pipe2x, pipe2yb, 54, 400);
-    CGRect p3TFrame=CGRectMake(pipe3x, pipe3yt, 54, 400);
-    CGRect p3BFrame=CGRectMake(pipe3x, pipe3yb, 54, 400);
+    CGRect p1TFrame=CGRectMake(pipe1x, pipe1yt, 60, 400);
+    CGRect p1BFrame=CGRectMake(pipe1x, pipe1yb, 60, 400);
+    CGRect p2TFrame=CGRectMake(pipe2x, pipe2yt, 60, 400);
+    CGRect p2BFrame=CGRectMake(pipe2x, pipe2yb, 60, 400);
+    CGRect p3TFrame=CGRectMake(pipe3x, pipe3yt, 60, 400);
+    CGRect p3BFrame=CGRectMake(pipe3x, pipe3yb, 60, 400);
     
     self.pipe1_top=[[UIImageView alloc] initWithFrame:p1TFrame];
     self.pipe1_bottom=[[UIImageView alloc] initWithFrame:p1BFrame];
@@ -108,33 +114,33 @@ BOOL startAds = TRUE;
     [self.view addSubview:self.pipe3_top];
     [self.view addSubview:self.pipe3_bottom];
     
-    [self.pipe1_top setImage:[UIImage imageNamed:@"pipe_down.png"]];
-    [self.pipe1_bottom setImage:[UIImage imageNamed:@"pipe_up.png"]];
-    [self.pipe2_top setImage:[UIImage imageNamed:@"pipe_down.png"]];
-    [self.pipe2_bottom setImage:[UIImage imageNamed:@"pipe_up.png"]];
-    [self.pipe3_top setImage:[UIImage imageNamed:@"pipe_down.png"]];
-    [self.pipe3_bottom setImage:[UIImage imageNamed:@"pipe_up.png"]];
+    [self.pipe1_top setImage:[UIImage imageNamed:@"seaweed_top.png"]];
+    [self.pipe1_bottom setImage:[UIImage imageNamed:@"seaweed_bottom.png"]];
+    [self.pipe2_top setImage:[UIImage imageNamed:@"seaweed_top.png"]];
+    [self.pipe2_bottom setImage:[UIImage imageNamed:@"seaweed_bottom.png"]];
+    [self.pipe3_top setImage:[UIImage imageNamed:@"seaweed_top.png"]];
+    [self.pipe3_bottom setImage:[UIImage imageNamed:@"seaweed_bottom.png"]];
     
     //place the ground
-    CGRect g1Frame=CGRectMake(groundx,groundy,320,30);
-    CGRect g2Frame=CGRectMake(ground2x,ground2y,320,30);
+    CGRect g1Frame=CGRectMake(groundx,groundy,320,73);
+    CGRect g2Frame=CGRectMake(ground2x,ground2y,320,73);
     self.ground1=[[UIImageView alloc] initWithFrame:g1Frame];
     self.ground2=[[UIImageView alloc] initWithFrame:g2Frame];
     [self.view addSubview:self.ground1];
     [self.view addSubview:self.ground2];
-    [self.ground1 setImage:[UIImage imageNamed:@"ground.png"]];
-    [self.ground2 setImage:[UIImage imageNamed:@"ground.png"]];
+    [self.ground1 setImage:[UIImage imageNamed:@"sand.png"]];
+    [self.ground2 setImage:[UIImage imageNamed:@"sand.png"]];
     
-    CGRect blockFrame=CGRectMake(0,458,320,110);
+    CGRect blockFrame=CGRectMake(0,471,320,110);
     self.block=[[UIImageView alloc] initWithFrame:blockFrame];
     [self.view addSubview:self.block];
     [self.block setImage:[UIImage imageNamed:@"block.png"]];
     
-    //place the bird
-    CGRect birdFrame=CGRectMake(75, 269, 30, 22);
-    self.bird=[[UIImageView alloc] initWithFrame:birdFrame];
-    [self.view addSubview:self.bird];
-    [self.bird setImage:[UIImage imageNamed:@"bird.png"]];
+    //place the fish
+    CGRect birdFrame=CGRectMake(75, 269, 30, 25);
+    self.fish=[[UIImageView alloc] initWithFrame:birdFrame];
+    [self.view addSubview:self.fish];
+    [self setFishFrame];
     
     //add the scoreboard
     CGRect scoresFrame=CGRectMake(20, 570, 280, 350);
@@ -180,8 +186,6 @@ BOOL startAds = TRUE;
 //handler for the frame based animations
 - (void) doFrame
 {
-    //
-    
     if(showScore)
     {
         if (startAds == TRUE)
@@ -207,7 +211,11 @@ BOOL startAds = TRUE;
     else if(started)
     {
         //apply gravity to the bird
-        birdVerticalSpeed+=gravity;
+        fishVerticalSpeed+=gravity;
+        
+        //animate the fish
+        [self setFishFrame];
+        
         
         //increase the difficulty
         difficulty+=0.1;
@@ -215,7 +223,7 @@ BOOL startAds = TRUE;
             difficulty=100;
         
         //get the frames for moving and checking collisions
-        CGRect birdFrame=self.bird.frame;
+        CGRect birdFrame=self.fish.frame;
         CGRect g1Frame=self.ground1.frame;
         CGRect g2Frame=self.ground2.frame;
         CGRect p1TFrame=self.pipe1_top.frame;
@@ -227,18 +235,24 @@ BOOL startAds = TRUE;
         
         
         //move the bird
-        birdFrame.origin.y+=birdVerticalSpeed;
-        if(birdFrame.origin.y>birdBottom)
+        birdFrame.origin.y+=fishVerticalSpeed;
+        if(birdFrame.origin.y>fishBottom)
         {
-            birdFrame.origin.y=birdBottom;
+            birdFrame.origin.y=fishBottom;
             crashed=YES;
             showScore=YES;
             NSLog(@"hit ground");
-            birdVerticalSpeed=0;
+            fishVerticalSpeed=0;
         }
-        self.bird.frame=birdFrame;
+        self.fish.frame=birdFrame;
         
+        //get current height and width of fish image
+        float currentFishWidth=birdFrame.size.width;
+        float currentFishHeight=birdFrame.size.width;
         
+        //get current height and width of seaweed image
+        float currentSeaweedWidth=p1TFrame.size.width;
+        float currentSeaweedHeight=p1TFrame.size.height;
         
         //move the ground
         if(!crashed)
@@ -258,19 +272,19 @@ BOOL startAds = TRUE;
             p1TFrame.origin.x-=horizontalSpeed;
             p1BFrame.origin.x-=horizontalSpeed;
             //check if we scored on this pipe
-            if(self.bird.frame.origin.x>p1TFrame.origin.x && !passedPipe1)
+            if(self.fish.frame.origin.x>p1TFrame.origin.x && !passedPipe1)
             {
                 passedPipe1=YES;
                 thisscore+=1;
             }
             //reset pipe 1 when it goes off screen
-            if(p1TFrame.origin.x<-54)
+            if(p1TFrame.origin.x<-currentSeaweedWidth)
             {
                 passedPipe1=NO;
                 p1TFrame.origin.x+=642;
                 p1BFrame.origin.x+=642;
                 float tmpy=[self getRandomY:difficulty];
-                p1TFrame.origin.y=tmpy-(gapsize/2)-400;
+                p1TFrame.origin.y=tmpy-(gapsize/2)-currentSeaweedHeight;
                 p1BFrame.origin.y=tmpy+(gapsize/2);
             }
             self.pipe1_top.frame=p1TFrame;
@@ -283,19 +297,19 @@ BOOL startAds = TRUE;
             p2TFrame.origin.x-=horizontalSpeed;
             p2BFrame.origin.x-=horizontalSpeed;
             //check if we scored on this pipe
-            if(self.bird.frame.origin.x>p2TFrame.origin.x && !passedPipe2)
+            if(self.fish.frame.origin.x>p2TFrame.origin.x && !passedPipe2)
             {
                 passedPipe2=YES;
                 thisscore+=1;
             }
             //reset pipe 2 when it goes off screen
-            if(p2TFrame.origin.x<-54)
+            if(p2TFrame.origin.x<-currentSeaweedWidth)
             {
                 passedPipe2=NO;
                 p2TFrame.origin.x+=642;
                 p2BFrame.origin.x+=642;
                 float tmpy=[self getRandomY:difficulty];
-                p2TFrame.origin.y=tmpy-(gapsize/2)-400;
+                p2TFrame.origin.y=tmpy-(gapsize/2)-currentSeaweedHeight;
                 p2BFrame.origin.y=tmpy+(gapsize/2);
             }
             self.pipe2_top.frame=p2TFrame;
@@ -308,52 +322,54 @@ BOOL startAds = TRUE;
             p3TFrame.origin.x-=horizontalSpeed;
             p3BFrame.origin.x-=horizontalSpeed;
             //check if we scored on this pipe
-            if(self.bird.frame.origin.x>p3TFrame.origin.x && !passedPipe3)
+            if(self.fish.frame.origin.x>p3TFrame.origin.x && !passedPipe3)
             {
                 passedPipe3=YES;
                 thisscore+=1;
             }
             //reset pipe 3 when it goes off screen
-            if(p3TFrame.origin.x<-54)
+            if(p3TFrame.origin.x<-currentSeaweedWidth)
             {
                 passedPipe3=NO;
                 p3TFrame.origin.x+=642;
                 p3BFrame.origin.x+=642;
                 float tmpy=[self getRandomY:difficulty];
-                p3TFrame.origin.y=tmpy-(gapsize/2)-400;
+                p3TFrame.origin.y=tmpy-(gapsize/2)-currentSeaweedHeight;
                 p3BFrame.origin.y=tmpy+(gapsize/2);
             }
             self.pipe3_top.frame=p3TFrame;
             self.pipe3_bottom.frame=p3BFrame;
         }
         
+        
+        
         //check for collisions
-        if (birdFrame.origin.x+30>p1TFrame.origin.x && birdFrame.origin.x<p1TFrame.origin.x+54 && birdFrame.origin.y+22>p1TFrame.origin.y && birdFrame.origin.y<p1TFrame.origin.y+400)
+        if (birdFrame.origin.x+currentFishWidth>p1TFrame.origin.x && birdFrame.origin.x<p1TFrame.origin.x+currentSeaweedWidth && birdFrame.origin.y+currentFishHeight>p1TFrame.origin.y && birdFrame.origin.y<p1TFrame.origin.y+currentSeaweedHeight)
         {
             NSLog(@"hit pipe 1 top");
             crashed=YES;
         }
-        if (birdFrame.origin.x+30>p1BFrame.origin.x && birdFrame.origin.x<p1BFrame.origin.x+54 && birdFrame.origin.y+22>p1BFrame.origin.y && birdFrame.origin.y<p1BFrame.origin.y+400)
+        if (birdFrame.origin.x+currentFishWidth>p1BFrame.origin.x && birdFrame.origin.x<p1BFrame.origin.x+currentSeaweedWidth && birdFrame.origin.y+currentFishHeight>p1BFrame.origin.y && birdFrame.origin.y<p1BFrame.origin.y+currentSeaweedHeight)
         {
             NSLog(@"hit pipe 1 bottom");
             crashed=YES;
         }
-        if (birdFrame.origin.x+30>p2TFrame.origin.x && birdFrame.origin.x<p2TFrame.origin.x+54 && birdFrame.origin.y+22>p2TFrame.origin.y && birdFrame.origin.y<p2TFrame.origin.y+400)
+        if (birdFrame.origin.x+currentFishWidth>p2TFrame.origin.x && birdFrame.origin.x<p2TFrame.origin.x+currentSeaweedWidth && birdFrame.origin.y+currentFishHeight>p2TFrame.origin.y && birdFrame.origin.y<p2TFrame.origin.y+currentSeaweedHeight)
         {
             NSLog(@"hit pipe 2 top");
             crashed=YES;
         }
-        if (birdFrame.origin.x+30>p2BFrame.origin.x && birdFrame.origin.x<p2BFrame.origin.x+54 && birdFrame.origin.y+22>p2BFrame.origin.y && birdFrame.origin.y<p2BFrame.origin.y+400)
+        if (birdFrame.origin.x+currentFishWidth>p2BFrame.origin.x && birdFrame.origin.x<p2BFrame.origin.x+currentSeaweedWidth && birdFrame.origin.y+currentFishHeight>p2BFrame.origin.y && birdFrame.origin.y<p2BFrame.origin.y+currentSeaweedHeight)
         {
             NSLog(@"hit pipe 2 bottom");
             crashed=YES;
         }
-        if (birdFrame.origin.x+30>p3TFrame.origin.x && birdFrame.origin.x<p3TFrame.origin.x+54 && birdFrame.origin.y+22>p3TFrame.origin.y && birdFrame.origin.y<p3TFrame.origin.y+400)
+        if (birdFrame.origin.x+currentFishWidth>p3TFrame.origin.x && birdFrame.origin.x<p3TFrame.origin.x+currentSeaweedWidth && birdFrame.origin.y+currentFishHeight>p3TFrame.origin.y && birdFrame.origin.y<p3TFrame.origin.y+currentSeaweedHeight)
         {
             NSLog(@"hit pipe 3 top");
             crashed=YES;
         }
-        if (birdFrame.origin.x+30>p3BFrame.origin.x && birdFrame.origin.x<p3BFrame.origin.x+54 && birdFrame.origin.y+22>p3BFrame.origin.y && birdFrame.origin.y<p3BFrame.origin.y+400)
+        if (birdFrame.origin.x+currentFishWidth>p3BFrame.origin.x && birdFrame.origin.x<p3BFrame.origin.x+currentSeaweedWidth && birdFrame.origin.y+currentFishHeight>p3BFrame.origin.y && birdFrame.origin.y<p3BFrame.origin.y+currentSeaweedHeight)
         {
             NSLog(@"hit pipe 3 bottom");
             crashed=YES;
@@ -385,12 +401,12 @@ BOOL startAds = TRUE;
     if(started)
     {
         if(!crashed)
-            birdVerticalSpeed=tapspeed;
+            fishVerticalSpeed=tapspeed;
     }
     else
     {
         started=YES;
-        birdVerticalSpeed=tapspeed;
+        fishVerticalSpeed=tapspeed;
     }
 }
 - (void) restartGame
@@ -404,17 +420,17 @@ BOOL startAds = TRUE;
     frametrigger=200;
     bannerStartPoint=100;
     gravity=0.35;
-    birdVerticalSpeed=0;
+    fishVerticalSpeed=0;
     tapspeed=-7;
-    birdBottom=406;
+    fishBottom=406;
     
     groundx=0;
     scoreBoardYTarg=100;
     ground2x=320;
-    groundy=428;
+    groundy=398;
     thisscore=0;
-    ground2y=428;
-    horizontalSpeed=3;
+    ground2y=398;
+    horizontalSpeed=2;
     difficulty=0;
     gapsize=120;
     
@@ -475,9 +491,9 @@ BOOL startAds = TRUE;
     self.ground2.frame=g2Frame;
     
     //place the bird
-    CGRect birdFrame=self.bird.frame;
+    CGRect birdFrame=self.fish.frame;
     birdFrame.origin.y=269;
-    self.bird.frame=birdFrame;
+    self.fish.frame=birdFrame;
     
     //add the scoreboard
     CGRect scoresFrame=self.scoreboard.frame;
@@ -491,6 +507,71 @@ BOOL startAds = TRUE;
     crashed=NO;
     
 }
+
+- (void) setFishFrame
+{
+    fishFrameDelay+=1;
+    bool changed=NO;
+    if(fishFrameDelay==5)
+    {
+        changed=YES;
+        if(fishFrameForwards)
+        {
+            fishFrame+=1;
+            if(fishFrame==5)
+            {
+                fishFrameForwards=NO;
+                fishFrame=3;
+            }
+        }
+        else
+        {
+            fishFrame-=1;
+            if(fishFrame==-1)
+            {
+                fishFrameForwards=YES;
+                fishFrame=1;
+            }
+        }
+        fishFrameDelay=0;
+    }
+    if(changed)
+    {
+        //work out angle offset for array, -60 is between 0-4, -30 is between 5-9, neutral is between 10-14
+        //+30 is between 15-19, +60 is between 20-24 and +90 is between 25-29
+        
+        NSLog(@"vertical speed: %f", fishVerticalSpeed);
+        
+        //verticalSpeedIndex is a number between 0 and 5, depending on what angle we should be pointing at
+        int verticalSpeedIndex;
+        
+        if(fishVerticalSpeed<=-6)
+            verticalSpeedIndex=0;
+        if(fishVerticalSpeed>-6 && fishVerticalSpeed<=-1)
+            verticalSpeedIndex=1;
+        if(fishVerticalSpeed>-1 && fishVerticalSpeed<=2)
+            verticalSpeedIndex=2;
+        if(fishVerticalSpeed>2 && fishVerticalSpeed<=4)
+            verticalSpeedIndex=3;
+        if(fishVerticalSpeed>4 && fishVerticalSpeed<=6)
+            verticalSpeedIndex=4;
+        if(crashed || (fishVerticalSpeed>6))
+            verticalSpeedIndex=5;
+        
+        //set the imageviews image and the frame to use to display it
+        int angleIndexOffset=verticalSpeedIndex*5+fishFrame;
+        CGRect oldFrame=self.fish.frame;
+        UIImage *tmp=[fishImages objectAtIndex:angleIndexOffset];
+        oldFrame.size.width=tmp.size.width;
+        oldFrame.size.height=tmp.size.height;
+        [self.fish setFrame:oldFrame];
+        [self.fish setImage:[fishImages objectAtIndex:angleIndexOffset]];
+        
+        //reset the frame delay
+        fishFrameDelay=0;
+    }
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
